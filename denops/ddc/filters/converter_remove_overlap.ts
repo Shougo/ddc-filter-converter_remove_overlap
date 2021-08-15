@@ -64,6 +64,7 @@ export class Filter extends BaseFilter {
       let skip = false;
       for (const pair of checkPairs) {
         if (
+          overlap > 0 &&
           word.includes(pair[0]) &&
           word.slice(0, -overlap).includes(pair[1])
         ) {
@@ -71,7 +72,7 @@ export class Filter extends BaseFilter {
           break;
         }
       }
-      if (skip) {
+      if (skip || overlap == 0) {
         continue;
       }
 
