@@ -2,15 +2,12 @@ import {
   BaseFilter,
   Candidate,
   Context,
-  DdcOptions,
-  FilterOptions,
-  SourceOptions,
-} from "https://deno.land/x/ddc_vim@v0.0.14/types.ts#^";
+} from "https://deno.land/x/ddc_vim@v0.3.0/types.ts#^";
 import {
   assertEquals,
   Denops,
   fn,
-} from "https://deno.land/x/ddc_vim@v0.0.14/deps.ts#^";
+} from "https://deno.land/x/ddc_vim@v0.3.0/deps.ts#^";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
@@ -21,32 +18,29 @@ function overlapLength(left: string, nextInputWords: string[]): number {
 }
 
 export class Filter extends BaseFilter {
-  async filter(
+  async filter(args: {
     denops: Denops,
     context: Context,
-    _options: DdcOptions,
-    _sourceOptions: SourceOptions,
-    _filterOptions: FilterOptions,
-    _filterParams: Record<string, unknown>,
-    _completeStr: string,
+    completeStr: string,
     candidates: Candidate[],
+  }
   ): Promise<Candidate[]> {
-    if (context.nextInput == "") {
-      return candidates;
+    if (args.context.nextInput == "") {
+      return args.candidates;
     }
 
-    const nextInputWords = context.nextInput.split(/([a-zA-Z_]\w*|\W)/).filter((
+    const nextInputWords = args.context.nextInput.split(/([a-zA-Z_]\w*|\W)/).filter((
       v,
     ) => v != "");
 
     // Skip parentheses if close parentheses is found after cursor.
-    const curPos = (await fn.getcurpos(denops)).slice(1, 3) as number[];
+    const curPos = (await fn.getcurpos(args.denops)).slice(1, 3) as number[];
     let checkPairs = [];
 
     async function searchPairs(begin: string, end: string): Promise<boolean> {
       const pairPos =
-        (await fn.searchpairpos(denops, begin, "", end, "nW")) as number[];
-      return context.input.includes(begin) && curPos < pairPos &&
+        (await fn.searchpairpos(args.denops, begin, "", end, "nW")) as number[];
+      return args.context.input.includes(begin) && curPos < pairPos &&
           curPos[0] == pairPos[0];
     }
     if (await searchPairs("(", ")")) {
@@ -56,7 +50,7 @@ export class Filter extends BaseFilter {
       checkPairs.push(["[", "]"]);
     }
 
-    for (const candidate of candidates) {
+    for (const candidate of args.candidates) {
       const word = candidate.word;
       const overlap = overlapLength(word, nextInputWords);
 
@@ -82,7 +76,7 @@ export class Filter extends BaseFilter {
       candidate.word = word.slice(0, -overlap);
     }
 
-    return candidates;
+    return args.candidates;
   }
 }
 
