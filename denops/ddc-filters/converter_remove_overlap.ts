@@ -2,12 +2,12 @@ import {
   BaseFilter,
   Candidate,
   Context,
-} from "https://deno.land/x/ddc_vim@v0.3.0/types.ts#^";
+} from "https://deno.land/x/ddc_vim@v0.9.0/types.ts#^";
 import {
   assertEquals,
   Denops,
   fn,
-} from "https://deno.land/x/ddc_vim@v0.3.0/deps.ts#^";
+} from "https://deno.land/x/ddc_vim@v0.9.0/deps.ts#^";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
@@ -17,7 +17,7 @@ function overlapLength(left: string, nextInputWords: string[]): number {
   return nextInputWords.slice(0, pos).join("").length;
 }
 
-export class Filter extends BaseFilter {
+export class Filter extends BaseFilter<{}> {
   async filter(args: {
     denops: Denops,
     context: Context,
@@ -78,6 +78,8 @@ export class Filter extends BaseFilter {
 
     return args.candidates;
   }
+
+  params(): {} { return {}; }
 }
 
 Deno.test("overlapLength", () => {
