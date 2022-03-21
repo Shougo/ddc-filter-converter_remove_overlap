@@ -1,13 +1,13 @@
 import {
   BaseFilter,
-  Candidate,
   Context,
-} from "https://deno.land/x/ddc_vim@v0.13.0/types.ts#^";
+  Item,
+} from "https://deno.land/x/ddc_vim@v2.2.0/types.ts";
 import {
   assertEquals,
   Denops,
   fn,
-} from "https://deno.land/x/ddc_vim@v0.13.0/deps.ts#^";
+} from "https://deno.land/x/ddc_vim@v2.2.0/deps.ts";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
@@ -17,21 +17,23 @@ function overlapLength(left: string, nextInputWords: string[]): number {
   return nextInputWords.slice(0, pos).join("").length;
 }
 
-export class Filter extends BaseFilter<{}> {
+type Params = Record<never, never>;
+
+export class Filter extends BaseFilter<Params> {
   async filter(args: {
-    denops: Denops,
-    context: Context,
-    completeStr: string,
-    candidates: Candidate[],
-  }
-  ): Promise<Candidate[]> {
+    denops: Denops;
+    context: Context;
+    completeStr: string;
+    items: Item[];
+  }): Promise<Item[]> {
     if (args.context.nextInput == "") {
-      return args.candidates;
+      return args.items;
     }
 
-    const nextInputWords = args.context.nextInput.split(/([a-zA-Z_]\w*|\W)/).filter((
-      v,
-    ) => v != "");
+    const nextInputWords = args.context.nextInput.split(/([a-zA-Z_]\w*|\W)/)
+      .filter((
+        v,
+      ) => v != "");
 
     // Skip parentheses if close parentheses is found after cursor.
     const curPos = (await fn.getcurpos(args.denops)).slice(1, 3) as number[];
@@ -41,7 +43,7 @@ export class Filter extends BaseFilter<{}> {
       const pairPos =
         (await fn.searchpairpos(args.denops, begin, "", end, "nW")) as number[];
       return args.context.input.includes(begin) && curPos < pairPos &&
-          curPos[0] == pairPos[0];
+        curPos[0] == pairPos[0];
     }
     if (await searchPairs("(", ")")) {
       checkPairs.push(["(", ")"]);
@@ -50,8 +52,8 @@ export class Filter extends BaseFilter<{}> {
       checkPairs.push(["[", "]"]);
     }
 
-    for (const candidate of args.candidates) {
-      const word = candidate.word;
+    for (const item of args.items) {
+      const word = item.word;
       const overlap = overlapLength(word, nextInputWords);
 
       // Check parentheses
@@ -70,16 +72,18 @@ export class Filter extends BaseFilter<{}> {
         continue;
       }
 
-      if (!("abbr" in candidate)) {
-        candidate.abbr = word;
+      if (!("abbr" in item)) {
+        item.abbr = word;
       }
-      candidate.word = word.slice(0, -overlap);
+      item.word = word.slice(0, -overlap);
     }
 
-    return args.candidates;
+    return args.items;
   }
 
-  params(): {} { return {}; }
+  params(): Params {
+    return {};
+  }
 }
 
 Deno.test("overlapLength", () => {
