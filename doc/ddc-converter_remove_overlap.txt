@@ -30,10 +30,10 @@ https://github.com/vim-denops/denops.vim
 ==============================================================================
 EXAMPLES				*ddc-converter_remove_overlap-examples*
 >
-	call ddc#custom#patch_global('sourceOptions', {
-	      \ '_': {
-	      \   'converters': ['converter_remove_overlap'],
-	      \ }
+	call ddc#custom#patch_global('sourceOptions', #{
+	      \   _: #{
+	      \     converters: ['converter_remove_overlap'],
+	      \   }
 	      \ })
 <
 
