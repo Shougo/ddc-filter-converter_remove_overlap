@@ -17,6 +17,9 @@ INTRODUCTION			*ddc-converter_remove_overlap-introduction*
 It is matched rank order sorter.  The higher the head matched word or already
 typed or inserted word.
 
+For example if you want to complete "foobar" before "bar", only "foo" is
+inserted.  Because "bar" is already inserted in the text.
+It is useful if you want to replace texts.
 
 ==============================================================================
 INSTALL					*ddc-converter_remove_overlap-install*
