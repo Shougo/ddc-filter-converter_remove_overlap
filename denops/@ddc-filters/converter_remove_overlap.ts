@@ -20,7 +20,7 @@ function overlapLength(left: string, nextInputWords: string[]): number {
 type Params = Record<never, never>;
 
 export class Filter extends BaseFilter<Params> {
-  async filter(args: {
+  override async filter(args: {
     denops: Denops;
     context: Context;
     completeStr: string;
@@ -37,7 +37,7 @@ export class Filter extends BaseFilter<Params> {
 
     // Skip parentheses if close parentheses is found after cursor.
     const curPos = (await fn.getcurpos(args.denops)).slice(1, 3) as number[];
-    let checkPairs = [];
+    const checkPairs = [];
 
     async function searchPairs(begin: string, end: string): Promise<boolean> {
       const pairPos =
@@ -81,7 +81,7 @@ export class Filter extends BaseFilter<Params> {
     return args.items;
   }
 
-  params(): Params {
+  override params(): Params {
     return {};
   }
 }

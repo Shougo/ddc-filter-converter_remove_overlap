@@ -5,8 +5,8 @@ Removes overlapped text for ddc.vim
 The filter removes overlapped text in a candidate's word.
 
 For example if you want to complete "foobar" before "bar", only "foo" is
-inserted.  Because "bar" is already inserted in the text.
-It is useful if you want to replace texts.
+inserted. Because "bar" is already inserted in the text. It is useful if you
+want to replace texts.
 
 ## Required
 
