@@ -1,4 +1,4 @@
-# ddc-converter_remove_overlap
+# ddc-filter-converter_remove_overlap
 
 Removes overlapped text for ddc.vim
 
