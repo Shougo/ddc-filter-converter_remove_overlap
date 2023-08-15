@@ -2,12 +2,12 @@ import {
   BaseFilter,
   Context,
   Item,
-} from "https://deno.land/x/ddc_vim@v3.4.0/types.ts";
+} from "https://deno.land/x/ddc_vim@v4.0.4/types.ts";
 import {
   assertEquals,
   Denops,
   fn,
-} from "https://deno.land/x/ddc_vim@v3.4.0/deps.ts";
+} from "https://deno.land/x/ddc_vim@v4.0.4/deps.ts";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
@@ -17,7 +17,7 @@ function overlapLength(left: string, nextInputWords: string[]): number {
   return nextInputWords.slice(0, pos).join("").length;
 }
 
-type Params = Record<never, never>;
+type Params = Record<string, never>;
 
 export class Filter extends BaseFilter<Params> {
   override async filter(args: {
