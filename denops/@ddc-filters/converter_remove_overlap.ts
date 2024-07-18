@@ -2,12 +2,12 @@ import {
   BaseFilter,
   Context,
   Item,
-} from "https://deno.land/x/ddc_vim@v4.0.4/types.ts";
+} from "https://deno.land/x/ddc_vim@v5.0.1/types.ts";
 import {
   assertEquals,
   Denops,
   fn,
-} from "https://deno.land/x/ddc_vim@v4.0.4/deps.ts";
+} from "https://deno.land/x/ddc_vim@v5.0.1/deps.ts";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
@@ -34,6 +34,10 @@ export class Filter extends BaseFilter<Params> {
       .filter((
         v,
       ) => v != "");
+
+    if (nextInputWords.length === 0) {
+      return args.items;
+    }
 
     // Skip parentheses if close parentheses is found after cursor.
     const curPos = (await fn.getcurpos(args.denops)).slice(1, 3) as number[];
