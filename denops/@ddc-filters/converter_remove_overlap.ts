@@ -1,13 +1,13 @@
 import {
   BaseFilter,
-  Context,
-  Item,
-} from "https://deno.land/x/ddc_vim@v5.0.1/types.ts";
-import {
-  assertEquals,
-  Denops,
-  fn,
-} from "https://deno.land/x/ddc_vim@v5.0.1/deps.ts";
+  type Context,
+  type Item,
+} from "jsr:@shougo/ddc-vim@6.0.0/types";
+
+import type { Denops } from "jsr:@denops/core@^7.0.0";
+import * as fn from "jsr:@denops/std@7.0.1/function";
+
+import { assertEquals } from "jsr:@std/assert@1.0.1";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
