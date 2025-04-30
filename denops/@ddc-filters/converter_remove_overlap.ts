@@ -41,8 +41,15 @@ export class Filter extends BaseFilter<Params> {
     const checkPairs = [];
 
     async function searchPairs(begin: string, end: string): Promise<boolean> {
-      const pairPos =
-        (await fn.searchpairpos(args.denops, begin, "", end, "nW")) as number[];
+      const pairPos = (await fn.searchpairpos(
+        args.denops,
+        begin,
+        "",
+        end,
+        "nW",
+        "",
+        await fn.line(args.denops, "."),
+      )) as number[];
       return args.context.input.includes(begin) && curPos < pairPos &&
         curPos[0] == pairPos[0];
     }
