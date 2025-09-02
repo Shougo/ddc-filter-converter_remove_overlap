@@ -1,10 +1,10 @@
-import { type Context, type Item } from "jsr:@shougo/ddc-vim@~7.0.0/types";
-import { BaseFilter } from "jsr:@shougo/ddc-vim@~7.0.0/filter";
+import { type Context, type Item } from "@shougo/ddc-vim/types";
+import { BaseFilter } from "@shougo/ddc-vim/filter";
 
-import type { Denops } from "jsr:@denops/core@~7.0.0";
-import * as fn from "jsr:@denops/std@~7.1.1/function";
+import type { Denops } from "@denops/std";
+import * as fn from "@denops/std/function";
 
-import { assertEquals } from "jsr:@std/assert@~1.0.3/equals";
+import { assertEquals } from "@std/assert/equals";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
   let pos = nextInputWords.length;
