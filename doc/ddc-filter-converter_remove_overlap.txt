@@ -15,8 +15,8 @@ Params			|ddc-filter-converter_remove_overlap-params|
 ==============================================================================
 INTRODUCTION		*ddc-filter-converter_remove_overlap-introduction*
 
-It is matched rank order sorter.  The higher the head matched word or already
-typed or inserted word.
+It is a converter for ddc.vim that removes overlapped text from a candidate's
+word.
 
 For example if you want to complete "foobar" before "bar", only "foo" is
 inserted.  Because "bar" is already inserted in the text.
