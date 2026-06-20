@@ -7,11 +7,16 @@ import * as fn from "@denops/std/function";
 import { assertEquals } from "@std/assert/equals";
 
 function overlapLength(left: string, nextInputWords: string[]): number {
-  let pos = nextInputWords.length;
-  while (pos > 0 && !left.endsWith(nextInputWords.slice(0, pos).join(""))) {
-    pos -= 1;
+  // Join once to avoid repeated allocations inside the loop.
+  const nextInput = nextInputWords.join("");
+  let len = nextInput.length;
+  for (let wordIndex = nextInputWords.length - 1; wordIndex >= 0; wordIndex--) {
+    if (left.endsWith(nextInput.slice(0, len))) {
+      return len;
+    }
+    len -= nextInputWords[wordIndex].length;
   }
-  return nextInputWords.slice(0, pos).join("").length;
+  return 0;
 }
 
 type Params = Record<string, never>;
@@ -38,7 +43,7 @@ export class Filter extends BaseFilter<Params> {
 
     // Skip parentheses if close parentheses is found after cursor.
     const curPos = (await fn.getcurpos(args.denops)).slice(1, 3) as number[];
-    const checkPairs = [];
+    const checkPairs: Array<[string, string]> = [];
 
     async function searchPairs(begin: string, end: string): Promise<boolean> {
       const pairPos = (await fn.searchpairpos(
@@ -50,8 +55,12 @@ export class Filter extends BaseFilter<Params> {
         "",
         await fn.line(args.denops, "."),
       )) as number[];
-      return args.context.input.includes(begin) && curPos < pairPos &&
-        curPos[0] == pairPos[0];
+      // searchpairpos returns [0, 0] when no matching pair is found.
+      if (pairPos[0] === 0) return false;
+      // The pair must be on the same line and after the cursor column.
+      return args.context.input.includes(begin) &&
+        curPos[0] === pairPos[0] &&
+        curPos[1] < pairPos[1];
     }
     if (await searchPairs("(", ")")) {
       checkPairs.push(["(", ")"]);
@@ -94,6 +103,40 @@ export class Filter extends BaseFilter<Params> {
   }
 }
 
-Deno.test("overlapLength", () => {
+Deno.test("overlapLength - basic suffix overlap", () => {
   assertEquals(overlapLength("date", ["te"]), 2);
+});
+
+Deno.test("overlapLength - full word overlap", () => {
+  // Completing "foobar" when "bar" follows the cursor: overlap is 3.
+  assertEquals(overlapLength("foobar", ["bar"]), 3);
+});
+
+Deno.test("overlapLength - no overlap", () => {
+  assertEquals(overlapLength("foo", ["bar"]), 0);
+});
+
+Deno.test("overlapLength - multi-word nextInput, partial match", () => {
+  // nextInputWords = ["bar", " ", "baz"], joined = "bar baz" (length 7).
+  // "foobar baz" ends with "bar baz" → overlap = 7.
+  assertEquals(overlapLength("foobar baz", ["bar", " ", "baz"]), 7);
+});
+
+Deno.test("overlapLength - multi-word nextInput, first word matches", () => {
+  // "foobar" ends with "bar" (first word of nextInputWords) but not the full
+  // "bar baz", so the overlap is 3.
+  assertEquals(overlapLength("foobar", ["bar", " ", "baz"]), 3);
+});
+
+Deno.test("overlapLength - multi-word nextInput, no match", () => {
+  // "hello" shares no suffix with any prefix of "bar baz".
+  assertEquals(overlapLength("hello", ["bar", " ", "baz"]), 0);
+});
+
+Deno.test("overlapLength - empty nextInputWords", () => {
+  assertEquals(overlapLength("foobar", []), 0);
+});
+
+Deno.test("overlapLength - empty left string", () => {
+  assertEquals(overlapLength("", ["bar"]), 0);
 });
